@@ -1,4 +1,4 @@
-package com.group2.artfinder.ui.artwork
+package com.group2.artfinder.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,10 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.group2.artfinder.data.model.ArtworkItem
+import com.group2.artfinder.model.ArtworkItem
 import com.group2.artfinder.ui.theme.*
 import com.group2.artfinder.viewmodel.ArtViewModel
 
@@ -141,7 +140,6 @@ fun ArtDetailScreen(navController: NavController, artworkId: Int?, viewModel: Ar
 
                     Spacer(Modifier.height(24.dp))
 
-                    // Details card
                     Surface(
                         modifier      = Modifier.fillMaxWidth(),
                         shape         = RoundedCornerShape(16.dp),

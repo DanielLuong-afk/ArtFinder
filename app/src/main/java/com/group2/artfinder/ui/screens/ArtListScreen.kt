@@ -1,4 +1,4 @@
-package com.group2.artfinder.ui.artwork
+package com.group2.artfinder.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,33 +16,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.group2.artfinder.data.model.ArtworkItem
+import com.group2.artfinder.model.ArtworkItem
 import com.group2.artfinder.ui.theme.*
 import com.group2.artfinder.viewmodel.ArtViewModel
+import com.group2.artfinder.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArtListScreen(navController: NavController) {
-    val viewModel: ArtViewModel = viewModel()
-    val artworks  by viewModel.artworks.observeAsState(emptyList())
-    val isLoading by viewModel.isLoading.observeAsState(false)
+fun ArtListScreen(
+    navController: NavController,
+    artViewModel:  ArtViewModel
+) {
+    val profileViewModel: ProfileViewModel = viewModel()
+    val user      by profileViewModel.user.observeAsState()
+    val artworks  by artViewModel.artworks.observeAsState(emptyList())
+    val isLoading by artViewModel.isLoading.observeAsState(false)
 
     var searchQuery by remember { mutableStateOf("") }
 
-    //    Only search when the user has stopped typing in the search box for 600ms
+    LaunchedEffect(Unit) { profileViewModel.loadProfile() }
+
     LaunchedEffect(searchQuery) {
         if (searchQuery.isEmpty()) {
-            viewModel.loadArtworks()
+            artViewModel.loadArtworks()
         } else {
             kotlinx.coroutines.delay(600)
-            viewModel.searchArtworks(searchQuery)
+            artViewModel.searchArtworks(searchQuery)
         }
     }
 
@@ -53,36 +59,57 @@ fun ArtListScreen(navController: NavController) {
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        Brush.verticalGradient(listOf(MuseumDark, MuseumBlack))
-                    )
+                    .background(Brush.verticalGradient(listOf(MuseumDark, MuseumBlack)))
                     .padding(horizontal = 20.dp, vertical = 20.dp)
             ) {
                 Column {
+
                     Text(
                         text  = "✦  ArtFinder",
                         style = MaterialTheme.typography.headlineMedium,
                         color = Gold
                     )
+
+                    val greeting = user?.let {
+                        val name = it.username.ifEmpty { it.firstName }
+                        if (name.isNotEmpty()) "Welcome back, $name" else "Welcome back"
+                    } ?: "Welcome back"
+
                     Text(
-                        text  = "Explore the world's greatest artworks",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Muted
+                        text  = greeting,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = OffWhite
                     )
+
                     Spacer(Modifier.height(16.dp))
 
-                    // Search bar
+                    // ── Dashboard cards ──────────────────────────────────────
+                    Row(
+                        modifier            = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        DashboardCard(
+                            modifier = Modifier.weight(1f),
+                            icon     = "✦",
+                            value    = "${user?.points ?: 0}",
+                            label    = "Points"
+                        )
+                        DashboardCard(
+                            modifier = Modifier.weight(1f),
+                            icon     = "◎",
+                            value    = "${user?.visitedCount ?: 0}",
+                            label    = "Artworks Visited"
+                        )
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
                     OutlinedTextField(
                         value         = searchQuery,
-                        onValueChange = {
-                            searchQuery = it
-                            if (it.isEmpty()) viewModel.loadArtworks()
-                            else viewModel.searchArtworks(it)
-                        },
+                        onValueChange = { searchQuery = it },
                         placeholder   = { Text("Search artworks, artists…", color = Muted) },
                         leadingIcon   = { Icon(Icons.Default.Search, contentDescription = null, tint = Gold) },
                         modifier      = Modifier.fillMaxWidth(),
@@ -111,7 +138,7 @@ fun ArtListScreen(navController: NavController) {
                 }
             } else {
                 LazyColumn(
-                    contentPadding    = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                    contentPadding      = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(artworks) { artwork ->
@@ -126,18 +153,51 @@ fun ArtListScreen(navController: NavController) {
 }
 
 @Composable
+fun DashboardCard(
+    modifier: Modifier = Modifier,
+    icon:     String,
+    value:    String,
+    label:    String
+) {
+    Surface(
+        modifier = modifier,
+        shape    = RoundedCornerShape(14.dp),
+        color    = MuseumCard
+    ) {
+        Row(
+            modifier          = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(icon, color = Gold, fontSize = 22.sp)
+            Spacer(Modifier.width(10.dp))
+            Column {
+                Text(
+                    text  = value,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Gold
+                )
+                Text(
+                    text  = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Muted
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun ArtworkListItem(artwork: ArtworkItem, onClick: () -> Unit) {
     Surface(
-        modifier      = Modifier
+        modifier       = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape         = RoundedCornerShape(16.dp),
-        color         = MuseumCard,
+        shape          = RoundedCornerShape(16.dp),
+        color          = MuseumCard,
         tonalElevation = 0.dp
     ) {
         Row(modifier = Modifier.height(IntrinsicSize.Min)) {
 
-            // Thumbnail
             Box(
                 modifier = Modifier
                     .width(90.dp)
@@ -146,12 +206,11 @@ fun ArtworkListItem(artwork: ArtworkItem, onClick: () -> Unit) {
                     .background(MuseumSurface)
             ) {
                 if (!artwork.image_id.isNullOrEmpty()) {
-                    val url = "https://www.artic.edu/iiif/2/${artwork.image_id}/full/200,/0/default.jpg"
                     AsyncImage(
-                        model          = url,
+                        model              = "https://www.artic.edu/iiif/2/${artwork.image_id}/full/200,/0/default.jpg",
                         contentDescription = artwork.title,
-                        contentScale   = ContentScale.Crop,
-                        modifier       = Modifier.fillMaxSize()
+                        contentScale       = ContentScale.Crop,
+                        modifier           = Modifier.fillMaxSize()
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -160,15 +219,14 @@ fun ArtworkListItem(artwork: ArtworkItem, onClick: () -> Unit) {
                 }
             }
 
-            // Info
             Column(
                 modifier = Modifier
                     .padding(horizontal = 14.dp, vertical = 12.dp)
                     .weight(1f)
             ) {
-                if (!artwork.artwork_type_title.isNullOrEmpty()) {
+                artwork.artwork_type_title?.takeIf { it.isNotEmpty() }?.let { type ->
                     Text(
-                        text  = artwork.artwork_type_title.uppercase(),
+                        text  = type.uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         color = Gold
                     )
@@ -181,20 +239,20 @@ fun ArtworkListItem(artwork: ArtworkItem, onClick: () -> Unit) {
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
-                if (!artwork.artist_display.isNullOrEmpty()) {
+                artwork.artist_display?.takeIf { it.isNotEmpty() }?.let { artist ->
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text     = artwork.artist_display,
+                        text     = artist,
                         style    = MaterialTheme.typography.bodySmall,
                         color    = Muted,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                if (!artwork.date_display.isNullOrEmpty()) {
+                artwork.date_display?.takeIf { it.isNotEmpty() }?.let { date ->
                     Spacer(Modifier.height(2.dp))
                     Text(
-                        text  = artwork.date_display,
+                        text  = date,
                         style = MaterialTheme.typography.bodySmall,
                         color = GoldDim
                     )

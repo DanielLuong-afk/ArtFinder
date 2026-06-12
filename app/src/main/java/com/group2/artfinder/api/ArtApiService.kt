@@ -1,8 +1,7 @@
-package com.group2.artfinder.data.api
+package com.group2.artfinder.api
 
-import com.group2.artfinder.data.model.ArtworkListResponse
+import com.group2.artfinder.model.ArtworkListResponse
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ArtApiService {

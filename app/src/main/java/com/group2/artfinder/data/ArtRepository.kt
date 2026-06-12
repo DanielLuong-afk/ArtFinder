@@ -1,6 +1,6 @@
-package com.group2.artfinder.repository
+package com.group2.artfinder.data
 
-import com.group2.artfinder.data.api.RetrofitInstance
+import com.group2.artfinder.api.RetrofitInstance
 
 class ArtRepository {
     private val api = RetrofitInstance.api

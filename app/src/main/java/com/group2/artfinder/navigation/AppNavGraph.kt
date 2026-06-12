@@ -1,4 +1,4 @@
-package com.group2.artfinder.ui
+package com.group2.artfinder.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -11,16 +11,17 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import com.group2.artfinder.ui.artwork.ArtDetailScreen
-import com.group2.artfinder.ui.artwork.ArtListScreen
-import com.group2.artfinder.ui.auth.LoginScreen
-import com.group2.artfinder.ui.auth.RegisterScreen
-import com.group2.artfinder.ui.profile.ProfileScreen
+import com.group2.artfinder.ui.screens.ArtDetailScreen
+import com.group2.artfinder.ui.screens.ArtListScreen
+import com.group2.artfinder.ui.screens.LoginScreen
+import com.group2.artfinder.ui.screens.RegisterScreen
+import com.group2.artfinder.ui.screens.ProfileScreen
 import com.group2.artfinder.ui.theme.Gold
 import com.group2.artfinder.ui.theme.Muted
 import com.group2.artfinder.ui.theme.MuseumSurface
@@ -40,7 +41,7 @@ val bottomNavItems = listOf(
 )
 
 @Composable
-fun ArtFinderApp() {
+fun AppNavGraph() {
     val navController   = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val artViewModel: ArtViewModel = viewModel()
@@ -56,7 +57,7 @@ fun ArtFinderApp() {
             if (showBottomBar) {
                 NavigationBar(
                     containerColor = MuseumSurface,
-                    tonalElevation = androidx.compose.ui.unit.Dp(0f)
+                    tonalElevation = Dp(0f)
                 ) {
                     bottomNavItems.forEach { item ->
                         val selected = currentRoute == item.route

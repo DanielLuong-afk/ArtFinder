@@ -1,4 +1,4 @@
-package com.group2.artfinder.data.api
+package com.group2.artfinder.api
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

@@ -1,4 +1,4 @@
-package com.group2.artfinder.ui.auth
+package com.group2.artfinder.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -30,16 +30,17 @@ fun RegisterScreen(navController: NavController) {
     val viewModel: AuthViewModel = viewModel()
     val authResult by viewModel.authResult.observeAsState()
 
-    var name         by remember { mutableStateOf("") }
+    var firstName    by remember { mutableStateOf("") }
+    var lastName     by remember { mutableStateOf("") }
     var email        by remember { mutableStateOf("") }
     var password     by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
     LaunchedEffect(authResult) {
-        if (authResult == true) {
-            navController.navigate("artList") { popUpTo("register") { inclusive = true } }
-        } else if (authResult == false) {
-            errorMessage = "Registration failed. Try a different email."
+        when (authResult) {
+            true  -> navController.navigate("artList") { popUpTo("register") { inclusive = true } }
+            false -> errorMessage = "Registration failed. Try a different email."
+            null  -> Unit
         }
     }
 
@@ -55,17 +56,13 @@ fun RegisterScreen(navController: NavController) {
                 .padding(horizontal = 32.dp, vertical = 48.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Gold)
                 }
             }
 
             Spacer(Modifier.height(16.dp))
-
             Text("✦", color = Gold, fontSize = 36.sp)
             Spacer(Modifier.height(8.dp))
             Text("Join ArtFinder", style = MaterialTheme.typography.headlineLarge, color = OffWhite)
@@ -80,23 +77,33 @@ fun RegisterScreen(navController: NavController) {
             Spacer(Modifier.height(36.dp))
 
             Surface(
-                modifier      = Modifier.fillMaxWidth(),
-                shape         = RoundedCornerShape(20.dp),
-                color         = MuseumCard,
+                modifier       = Modifier.fillMaxWidth(),
+                shape          = RoundedCornerShape(20.dp),
+                color          = MuseumCard,
                 tonalElevation = 0.dp
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
                     Text("Create your account", style = MaterialTheme.typography.headlineSmall, color = OffWhite)
                     Spacer(Modifier.height(20.dp))
 
-                    OutlinedTextField(
-                        value         = name,
-                        onValueChange = { name = it },
-                        label         = { Text("Full Name") },
-                        modifier      = Modifier.fillMaxWidth(),
-                        shape         = RoundedCornerShape(12.dp),
-                        colors        = artTextFieldColors()
-                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value         = firstName,
+                            onValueChange = { firstName = it },
+                            label         = { Text("First Name") },
+                            modifier      = Modifier.weight(1f),
+                            shape         = RoundedCornerShape(12.dp),
+                            colors        = artTextFieldColors()
+                        )
+                        OutlinedTextField(
+                            value         = lastName,
+                            onValueChange = { lastName = it },
+                            label         = { Text("Last Name") },
+                            modifier      = Modifier.weight(1f),
+                            shape         = RoundedCornerShape(12.dp),
+                            colors        = artTextFieldColors()
+                        )
+                    }
                     Spacer(Modifier.height(12.dp))
 
                     OutlinedTextField(
@@ -127,7 +134,7 @@ fun RegisterScreen(navController: NavController) {
                     Spacer(Modifier.height(20.dp))
 
                     Button(
-                        onClick  = { viewModel.register(email, password, name) },
+                        onClick  = { viewModel.register(email, password, firstName, lastName) },
                         modifier = Modifier.fillMaxWidth().height(50.dp),
                         shape    = RoundedCornerShape(12.dp),
                         colors   = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = MuseumBlack)
