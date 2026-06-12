@@ -36,7 +36,15 @@ fun ArtListScreen(navController: NavController) {
 
     var searchQuery by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) { viewModel.loadArtworks() }
+    //    Only search when the user has stopped typing in the search box for 600ms
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isEmpty()) {
+            viewModel.loadArtworks()
+        } else {
+            kotlinx.coroutines.delay(600)
+            viewModel.searchArtworks(searchQuery)
+        }
+    }
 
     Box(
         modifier = Modifier

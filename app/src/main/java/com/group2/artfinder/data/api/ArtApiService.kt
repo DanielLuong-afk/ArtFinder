@@ -18,6 +18,6 @@ interface ArtApiService {
     suspend fun searchArtworks(
         @Query("q") query: String,
         @Query("limit") limit: Int = 20,
-        @Query("fields") fields: String = "id,title,artist_display,artwork_type_title,image_id"
+        @Query("fields") fields: String = "id,title,artist_display,artwork_type_title,image_id,place_of_origin,gallery_title,date_display,medium_display,latitude,longitude"
     ): ArtworkListResponse
 }

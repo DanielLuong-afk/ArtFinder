@@ -24,6 +24,7 @@ import com.group2.artfinder.ui.profile.ProfileScreen
 import com.group2.artfinder.ui.theme.Gold
 import com.group2.artfinder.ui.theme.Muted
 import com.group2.artfinder.ui.theme.MuseumSurface
+import com.group2.artfinder.viewmodel.ArtViewModel
 import com.group2.artfinder.viewmodel.AuthViewModel
 
 data class BottomNavItem(
@@ -42,6 +43,7 @@ val bottomNavItems = listOf(
 fun ArtFinderApp() {
     val navController   = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
+    val artViewModel: ArtViewModel = viewModel()
     val startDestination = if (authViewModel.isLoggedIn()) "artList" else "login"
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -101,14 +103,14 @@ fun ArtFinderApp() {
                 RegisterScreen(navController)
             }
             composable("artList") {
-                ArtListScreen(navController)
+                ArtListScreen(navController, artViewModel)
             }
             composable(
                 route     = "artDetail/{artworkId}",
                 arguments = listOf(navArgument("artworkId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val id = backStackEntry.arguments?.getInt("artworkId")
-                ArtDetailScreen(navController, artworkId = id)
+                ArtDetailScreen(navController, artworkId = id, artViewModel)
             }
             composable("profile") {
                 ProfileScreen(navController)

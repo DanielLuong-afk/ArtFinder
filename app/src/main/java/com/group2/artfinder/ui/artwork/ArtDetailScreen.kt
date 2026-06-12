@@ -26,8 +26,8 @@ import com.group2.artfinder.viewmodel.ArtViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArtDetailScreen(navController: NavController, artworkId: Int?) {
-    val viewModel: ArtViewModel = viewModel()
+fun ArtDetailScreen(navController: NavController, artworkId: Int?, viewModel: ArtViewModel) {
+
     val artworks by viewModel.artworks.observeAsState(initial = emptyList<ArtworkItem>())
     val artwork  = artworks.find { it.id == artworkId }
 
@@ -54,7 +54,7 @@ fun ArtDetailScreen(navController: NavController, artworkId: Int?) {
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                // Hero image with gradient overlay
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -77,7 +77,6 @@ fun ArtDetailScreen(navController: NavController, artworkId: Int?) {
                         }
                     }
 
-                    // Gradient fade bottom
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -90,7 +89,6 @@ fun ArtDetailScreen(navController: NavController, artworkId: Int?) {
                             )
                     )
 
-                    // Back button
                     IconButton(
                         onClick  = { navController.popBackStack() },
                         modifier = Modifier
@@ -106,11 +104,9 @@ fun ArtDetailScreen(navController: NavController, artworkId: Int?) {
                     }
                 }
 
-                // Content below hero
                 Column(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                 ) {
-                    // Type pill
                     if (!artwork.artwork_type_title.isNullOrEmpty()) {
                         Surface(
                             shape = RoundedCornerShape(50),
@@ -126,14 +122,13 @@ fun ArtDetailScreen(navController: NavController, artworkId: Int?) {
                         Spacer(Modifier.height(10.dp))
                     }
 
-                    // Title
                     Text(
                         text  = artwork.title,
                         style = MaterialTheme.typography.headlineLarge,
                         color = OffWhite
                     )
 
-                    // Artist
+
                     if (!artwork.artist_display.isNullOrEmpty()) {
                         Spacer(Modifier.height(6.dp))
                         Text(

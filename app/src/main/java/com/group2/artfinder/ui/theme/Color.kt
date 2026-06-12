@@ -2,7 +2,6 @@ package com.group2.artfinder.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ArtFinder Museum Palette
 val MuseumBlack     = Color(0xFF0D0D14)
 val MuseumDark      = Color(0xFF1A1A2E)
 val MuseumSurface   = Color(0xFF22223A)
