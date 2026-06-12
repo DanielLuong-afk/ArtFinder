@@ -1,43 +1,118 @@
 package com.group2.artfinder.ui
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
+import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.group2.artfinder.ui.artwork.ArtDetailScreen
 import com.group2.artfinder.ui.artwork.ArtListScreen
 import com.group2.artfinder.ui.auth.LoginScreen
 import com.group2.artfinder.ui.auth.RegisterScreen
 import com.group2.artfinder.ui.profile.ProfileScreen
+import com.group2.artfinder.ui.theme.Gold
+import com.group2.artfinder.ui.theme.Muted
+import com.group2.artfinder.ui.theme.MuseumSurface
 import com.group2.artfinder.viewmodel.AuthViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 
-@RequiresApi(Build.VERSION_CODES.O)
+data class BottomNavItem(
+    val label: String,
+    val route: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector
+)
+
+val bottomNavItems = listOf(
+    BottomNavItem("Discover", "artList", Icons.Filled.Search, Icons.Outlined.Search),
+    BottomNavItem("Profile",  "profile",  Icons.Filled.Person, Icons.Outlined.Person)
+)
+
 @Composable
 fun ArtFinderApp() {
-    val navController = rememberNavController()
+    val navController   = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
-
     val startDestination = if (authViewModel.isLoggedIn()) "artList" else "login"
 
-    NavHost(navController = navController, startDestination = startDestination) {
-        composable("login") {
-            LoginScreen(navController)
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val showBottomBar = currentRoute in bottomNavItems.map { it.route }
+
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                NavigationBar(
+                    containerColor = MuseumSurface,
+                    tonalElevation = androidx.compose.ui.unit.Dp(0f)
+                ) {
+                    bottomNavItems.forEach { item ->
+                        val selected = currentRoute == item.route
+                        NavigationBarItem(
+                            selected    = selected,
+                            onClick     = {
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState    = true
+                                }
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
+                                    contentDescription = item.label
+                                )
+                            },
+                            label = { Text(item.label) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor   = Gold,
+                                selectedTextColor   = Gold,
+                                unselectedIconColor = Muted,
+                                unselectedTextColor = Muted,
+                                indicatorColor      = MuseumSurface
+                            )
+                        )
+                    }
+                }
+            }
         }
-        composable("register") {
-            RegisterScreen(navController)
-        }
-        composable("artList") {
-            ArtListScreen(navController)
-        }
-        composable("artDetail/{artworkId}") { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("artworkId")?.toIntOrNull()
-            ArtDetailScreen(navController, artworkId = id)
-        }
-        composable("profile") {
-            ProfileScreen(navController)
+    ) { innerPadding ->
+        NavHost(
+            navController    = navController,
+            startDestination = startDestination,
+            modifier         = Modifier.padding(innerPadding)
+        ) {
+            composable("login") {
+                LoginScreen(navController)
+            }
+            composable("register") {
+                RegisterScreen(navController)
+            }
+            composable("artList") {
+                ArtListScreen(navController)
+            }
+            composable(
+                route     = "artDetail/{artworkId}",
+                arguments = listOf(navArgument("artworkId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getInt("artworkId")
+                ArtDetailScreen(navController, artworkId = id)
+            }
+            composable("profile") {
+                ProfileScreen(navController)
+            }
         }
     }
 }

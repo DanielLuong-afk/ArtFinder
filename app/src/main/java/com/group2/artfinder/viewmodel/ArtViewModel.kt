@@ -17,8 +17,9 @@ class ArtViewModel : ViewModel() {
             isLoading.value = true
             try {
                 val response = repo.getArtworks(page)
-                artworks.value = response.data
+                artworks.value = response.data ?: emptyList()
             } catch (e: Exception) {
+                android.util.Log.e("ArtViewModel", "Error loading artworks", e)
                 artworks.value = emptyList()
             }
             isLoading.value = false
@@ -30,7 +31,7 @@ class ArtViewModel : ViewModel() {
             isLoading.value = true
             try {
                 val response = repo.searchArtworks(query)
-                artworks.value = response.data
+                artworks.value = response.data ?: emptyList()
             } catch (e: Exception) {
                 artworks.value = emptyList()
             }

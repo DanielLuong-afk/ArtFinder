@@ -1,7 +1,9 @@
 package com.group2.artfinder.ui.artwork
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -10,12 +12,16 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.group2.artfinder.data.model.ArtworkItem
+import com.group2.artfinder.ui.theme.*
 import com.group2.artfinder.viewmodel.ArtViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,59 +29,146 @@ import com.group2.artfinder.viewmodel.ArtViewModel
 fun ArtDetailScreen(navController: NavController, artworkId: Int?) {
     val viewModel: ArtViewModel = viewModel()
     val artworks by viewModel.artworks.observeAsState(initial = emptyList<ArtworkItem>())
-
-    val artwork = artworks.find { it.id == artworkId }
+    val artwork  = artworks.find { it.id == artworkId }
 
     LaunchedEffect(Unit) {
         if (artworks.isEmpty()) viewModel.loadArtworks()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Artwork Detail") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { padding ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MuseumBlack)
+    ) {
         if (artwork == null) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(color = Gold)
+                    Spacer(Modifier.height(12.dp))
+                    Text("Loading artwork…", color = Muted, style = MaterialTheme.typography.bodySmall)
+                }
             }
         } else {
             Column(
                 modifier = Modifier
-                    .padding(padding)
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
             ) {
-                if (!artwork.image_id.isNullOrEmpty()) {
-                    val imageUrl =
-                        "https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg"
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = artwork.title,
+                // Hero image with gradient overlay
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(320.dp)
+                ) {
+                    if (!artwork.image_id.isNullOrEmpty()) {
+                        val imageUrl = "https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg"
+                        AsyncImage(
+                            model              = imageUrl,
+                            contentDescription = artwork.title,
+                            contentScale       = ContentScale.Crop,
+                            modifier           = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Box(
+                            Modifier.fillMaxSize().background(MuseumSurface),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("✦", color = GoldDim, style = MaterialTheme.typography.displayLarge)
+                        }
+                    }
+
+                    // Gradient fade bottom
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(250.dp),
-                        contentScale = ContentScale.Crop
+                            .height(160.dp)
+                            .align(Alignment.BottomCenter)
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(Color.Transparent, MuseumBlack)
+                                )
+                            )
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Back button
+                    IconButton(
+                        onClick  = { navController.popBackStack() },
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(8.dp)
+                            .background(MuseumBlack.copy(alpha = 0.5f), RoundedCornerShape(50))
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = OffWhite
+                        )
+                    }
                 }
 
-                Text(artwork.title, style = MaterialTheme.typography.headlineSmall)
-                Spacer(modifier = Modifier.height(8.dp))
+                // Content below hero
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+                ) {
+                    // Type pill
+                    if (!artwork.artwork_type_title.isNullOrEmpty()) {
+                        Surface(
+                            shape = RoundedCornerShape(50),
+                            color = GoldDim.copy(alpha = 0.35f)
+                        ) {
+                            Text(
+                                text     = artwork.artwork_type_title.uppercase(),
+                                style    = MaterialTheme.typography.labelSmall,
+                                color    = Gold,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                            )
+                        }
+                        Spacer(Modifier.height(10.dp))
+                    }
 
-                DetailRow("Artist", artwork.artist_display)
-                DetailRow("Type", artwork.artwork_type_title)
-                DetailRow("Date", artwork.date_display)
-                DetailRow("Medium", artwork.medium_display)
-                DetailRow("Gallery", artwork.gallery_title)
-                DetailRow("Origin", artwork.place_of_origin)
+                    // Title
+                    Text(
+                        text  = artwork.title,
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = OffWhite
+                    )
+
+                    // Artist
+                    if (!artwork.artist_display.isNullOrEmpty()) {
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text      = artwork.artist_display,
+                            style     = MaterialTheme.typography.bodyMedium,
+                            color     = Muted,
+                            fontStyle = FontStyle.Italic
+                        )
+                    }
+
+                    Spacer(Modifier.height(24.dp))
+
+                    // Details card
+                    Surface(
+                        modifier      = Modifier.fillMaxWidth(),
+                        shape         = RoundedCornerShape(16.dp),
+                        color         = MuseumCard
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                "Artwork Details",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Gold
+                            )
+                            Spacer(Modifier.height(12.dp))
+
+                            DetailRow("Date",    artwork.date_display)
+                            DetailRow("Medium",  artwork.medium_display)
+                            DetailRow("Gallery", artwork.gallery_title)
+                            DetailRow("Origin",  artwork.place_of_origin)
+                        }
+                    }
+
+                    Spacer(Modifier.height(32.dp))
+                }
             }
         }
     }
@@ -84,14 +177,26 @@ fun ArtDetailScreen(navController: NavController, artworkId: Int?) {
 @Composable
 fun DetailRow(label: String, value: String?) {
     if (!value.isNullOrEmpty()) {
-        Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 6.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment     = Alignment.Top
+        ) {
             Text(
-                label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text     = label.uppercase(),
+                style    = MaterialTheme.typography.labelSmall,
+                color    = Muted,
+                modifier = Modifier.width(72.dp)
             )
-            Text(value, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text     = value,
+                style    = MaterialTheme.typography.bodyMedium,
+                color    = OffWhite,
+                modifier = Modifier.weight(1f)
+            )
         }
-        Spacer(modifier = Modifier.height(4.dp))
+        HorizontalDivider(color = MuseumSurface, thickness = 0.5.dp)
     }
 }

@@ -1,116 +1,180 @@
 package com.group2.artfinder.ui.profile
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.group2.artfinder.ui.auth.artTextFieldColors
+import com.group2.artfinder.ui.theme.*
 import com.group2.artfinder.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfileScreen(navController: NavController) {
     val viewModel: ProfileViewModel = viewModel()
     val profile by viewModel.profile.observeAsState()
 
     var nameInput by remember { mutableStateOf("") }
-    var saved by remember { mutableStateOf(false) }
+    var saved     by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadProfile()
-    }
-
+    LaunchedEffect(Unit) { viewModel.loadProfile() }
     LaunchedEffect(profile) {
         profile?.get("name")?.let { nameInput = it.toString() }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("My Profile") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { padding ->
+    val email  = profile?.get("email")?.toString() ?: ""
+    val points = (profile?.get("points") as? Long)?.toInt() ?: 0
+    val initial = nameInput.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MuseumBlack)
+    ) {
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(24.dp)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            Text("Email: ${profile?.get("email") ?: ""}", style = MaterialTheme.typography.bodyLarge)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Points: ${profile?.get("points") ?: 0}", style = MaterialTheme.typography.bodyLarge)
-            Spacer(modifier = Modifier.height(24.dp))
-
-            OutlinedTextField(
-                value = nameInput,
-                onValueChange = { nameInput = it; saved = false },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(
-                onClick = {
-                    viewModel.updateName(nameInput)
-                    saved = true
-                },
-                modifier = Modifier.fillMaxWidth()
+            // Header banner
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .background(Brush.verticalGradient(listOf(MuseumDark, MuseumBlack)))
             ) {
-                Text("Save Changes")
-            }
-
-            if (saved) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Profile updated!", color = MaterialTheme.colorScheme.primary)
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            OutlinedButton(
-                onClick = {
-                    viewModel.logout()
-                    navController.navigate("login") {
-                        popUpTo(0) { inclusive = true }
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement   = Arrangement.Center,
+                    horizontalAlignment   = Alignment.CenterHorizontally
+                ) {
+                    // Avatar circle
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(CircleShape)
+                            .background(Brush.radialGradient(listOf(GoldDim, MuseumSurface))),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(initial, color = Gold, fontSize = 28.sp)
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Logout")
+                    Spacer(Modifier.height(10.dp))
+                    Text(nameInput, style = MaterialTheme.typography.headlineSmall, color = OffWhite)
+                    Text(email, style = MaterialTheme.typography.bodySmall, color = Muted)
+                }
             }
+
+            // Points badge
+            Spacer(Modifier.height(16.dp))
+            Surface(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .fillMaxWidth(),
+                shape    = RoundedCornerShape(16.dp),
+                color    = MuseumCard
+            ) {
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("✦", color = Gold, fontSize = 28.sp)
+                    Spacer(Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            "$points pts",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = Gold
+                        )
+                        Text("Collection points", style = MaterialTheme.typography.bodySmall, color = Muted)
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            // Edit profile card
+            Surface(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .fillMaxWidth(),
+                shape    = RoundedCornerShape(16.dp),
+                color    = MuseumCard
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        "Edit Profile",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Gold
+                    )
+                    Spacer(Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value         = nameInput,
+                        onValueChange = { nameInput = it; saved = false },
+                        label         = { Text("Display Name") },
+                        modifier      = Modifier.fillMaxWidth(),
+                        shape         = RoundedCornerShape(12.dp),
+                        colors        = artTextFieldColors()
+                    )
+                    Spacer(Modifier.height(12.dp))
+
+                    Button(
+                        onClick  = { viewModel.updateName(nameInput); saved = true },
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        shape    = RoundedCornerShape(12.dp),
+                        colors   = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = MuseumBlack)
+                    ) {
+                        Text("Save Changes", style = MaterialTheme.typography.titleMedium)
+                    }
+
+                    if (saved) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            "✓  Profile updated",
+                            color     = Gold,
+                            style     = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center,
+                            modifier  = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Logout
+            OutlinedButton(
+                onClick  = {
+                    viewModel.logout()
+                    navController.navigate("login") { popUpTo(0) { inclusive = true } }
+                },
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape    = RoundedCornerShape(12.dp),
+                colors   = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed),
+                border   = androidx.compose.foundation.BorderStroke(1.dp, ErrorRed)
+            ) {
+                Text("Sign Out", style = MaterialTheme.typography.titleMedium)
+            }
+
+            Spacer(Modifier.height(32.dp))
         }
     }
 }
