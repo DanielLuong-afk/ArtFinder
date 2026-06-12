@@ -1,24 +1,28 @@
 package com.group2.artfinder.viewmodel
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.group2.artfinder.data.UserRepository
 import kotlinx.coroutines.launch
-import androidx.lifecycle.MutableLiveData
-import com.group2.artfinder.repository.UserRepository
 
 class AuthViewModel : ViewModel() {
+
     private val repo = UserRepository()
 
-    val authResult = MutableLiveData<Boolean>()
+    private val _authResult = MutableLiveData<Boolean?>()
+    val authResult: LiveData<Boolean?> = _authResult
 
-    fun register(email: String, password: String, name: String) {
+    fun register(email: String, password: String, firstName: String, lastName: String) {
         viewModelScope.launch {
-            authResult.value = repo.register(email, password, name)
+            _authResult.value = repo.register(email, password, firstName, lastName)
         }
     }
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            authResult.value = repo.login(email, password)
+            _authResult.value = repo.login(email, password)
         }
     }
 

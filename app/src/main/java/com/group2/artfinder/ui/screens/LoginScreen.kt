@@ -1,4 +1,4 @@
-package com.group2.artfinder.ui.auth
+package com.group2.artfinder.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,10 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -56,7 +53,6 @@ fun LoginScreen(navController: NavController) {
             verticalArrangement   = Arrangement.Center,
             horizontalAlignment   = Alignment.CenterHorizontally
         ) {
-            // Logo area
             Text(
                 text  = "✦",
                 color = Gold,
@@ -78,7 +74,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(48.dp))
 
-            // Card
             Surface(
                 modifier      = Modifier.fillMaxWidth(),
                 shape         = RoundedCornerShape(20.dp),
