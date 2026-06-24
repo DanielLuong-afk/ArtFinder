@@ -22,13 +22,26 @@ import coil.compose.AsyncImage
 import com.group2.artfinder.model.ArtworkItem
 import com.group2.artfinder.ui.theme.*
 import com.group2.artfinder.viewmodel.ArtViewModel
+import com.group2.artfinder.viewmodel.VisitedArtworkViewModel
+import androidx.compose.runtime.livedata.observeAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArtDetailScreen(navController: NavController, artworkId: Int?, viewModel: ArtViewModel) {
+fun ArtDetailScreen(
+    navController:    NavController,
+    artworkId:        Int?,
+    viewModel:        ArtViewModel,
+    visitedViewModel: VisitedArtworkViewModel
+) {
 
     val artworks by viewModel.artworks.observeAsState(initial = emptyList<ArtworkItem>())
     val artwork  = artworks.find { it.id == artworkId }
+
+    val isVisited by visitedViewModel.isVisited.observeAsState(false)
+
+    LaunchedEffect(artworkId) {
+        artworkId?.let { visitedViewModel.checkIfVisited(it) }
+    }
 
     LaunchedEffect(Unit) {
         if (artworks.isEmpty()) viewModel.loadArtworks()
@@ -159,6 +172,41 @@ fun ArtDetailScreen(navController: NavController, artworkId: Int?, viewModel: Ar
                             DetailRow("Origin",  artwork.place_of_origin)
                         }
                     }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Button(
+                        onClick  = { artwork?.let { visitedViewModel.addVisitedArtwork(it) } },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape    = RoundedCornerShape(12.dp),
+                        colors   = ButtonDefaults.buttonColors(
+                            containerColor = if (isVisited) GoldDim else Gold,
+                            contentColor   = MuseumBlack
+                        )
+                    ) {
+                        Text(
+                            if (isVisited) "✓  Added to Collection" else "✦  Mark as Visited",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick  = {
+                            val lat = artwork.latitude ?: 41.8796
+                            val lng = artwork.longitude ?: -87.6237
+                            navController.navigate("artMap/${artwork.title}/$lat/$lng/$isVisited")
+                        },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        shape    = RoundedCornerShape(12.dp),
+                        border   = androidx.compose.foundation.BorderStroke(1.dp, Gold),
+                        colors   = ButtonDefaults.outlinedButtonColors(contentColor = Gold)
+                    ) {
+                        Text("✦  View on Map", style = MaterialTheme.typography.titleMedium)
+                    }
+
 
                     Spacer(Modifier.height(32.dp))
                 }

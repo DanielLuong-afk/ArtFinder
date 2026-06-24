@@ -27,6 +27,11 @@ import com.group2.artfinder.ui.theme.Muted
 import com.group2.artfinder.ui.theme.MuseumSurface
 import com.group2.artfinder.viewmodel.ArtViewModel
 import com.group2.artfinder.viewmodel.AuthViewModel
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import com.group2.artfinder.ui.screens.ArtMapScreen
+import com.group2.artfinder.ui.screens.VisitedArtworkScreen
+import com.group2.artfinder.viewmodel.VisitedArtworkViewModel
 
 data class BottomNavItem(
     val label: String,
@@ -36,8 +41,9 @@ data class BottomNavItem(
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem("Discover", "artList", Icons.Filled.Search, Icons.Outlined.Search),
-    BottomNavItem("Profile",  "profile",  Icons.Filled.Person, Icons.Outlined.Person)
+    BottomNavItem("Discover",   "artList", Icons.Filled.Search,   Icons.Outlined.Search),
+    BottomNavItem("Collection", "visited", Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder),
+    BottomNavItem("Profile",    "profile", Icons.Filled.Person,   Icons.Outlined.Person)
 )
 
 @Composable
@@ -45,12 +51,13 @@ fun AppNavGraph() {
     val navController   = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val artViewModel: ArtViewModel = viewModel()
+    val visitedViewModel: VisitedArtworkViewModel = viewModel()
     val startDestination = if (authViewModel.isLoggedIn()) "artList" else "login"
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBottomBar = currentRoute in bottomNavItems.map { it.route }
+    val showBottomBar = currentRoute in listOf("artList", "visited", "profile")
 
     Scaffold(
         bottomBar = {
@@ -111,8 +118,20 @@ fun AppNavGraph() {
                 arguments = listOf(navArgument("artworkId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val id = backStackEntry.arguments?.getInt("artworkId")
-                ArtDetailScreen(navController, artworkId = id, artViewModel)
+                ArtDetailScreen(navController, artworkId = id, artViewModel, visitedViewModel)
             }
+
+            composable("visited") {
+                VisitedArtworkScreen(navController, visitedViewModel)
+            }
+            composable("artMap/{title}/{latitude}/{longitude}/{isVisited}") { backStackEntry ->
+                val title     = backStackEntry.arguments?.getString("title") ?: ""
+                val latitude  = backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull() ?: 0.0
+                val longitude = backStackEntry.arguments?.getString("longitude")?.toDoubleOrNull() ?: 0.0
+                val isVisited = backStackEntry.arguments?.getString("isVisited")?.toBoolean() ?: false
+                ArtMapScreen(navController, title, latitude, longitude, isVisited)
+            }
+
             composable("profile") {
                 ProfileScreen(navController)
             }

@@ -1,5 +1,4 @@
 package com.group2.artfinder.model
-
 data class ArtworkListResponse(
     val data: List<ArtworkItem>,
     val pagination: Pagination
