@@ -14,5 +14,7 @@ data class VisitedArtwork(
     val medium_display: String? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,
-    val visitedAt: Timestamp? = null
+    val visitedAt: Timestamp? = null,
+    val photos: List<String> = emptyList(),
+    val pointsAwarded: Int = 0
 )

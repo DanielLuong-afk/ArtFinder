@@ -104,16 +104,49 @@ fun ProfileScreen(navController: NavController) {
                 shape    = RoundedCornerShape(16.dp),
                 color    = MuseumCard
             ) {
-                Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text("✦", color = Gold, fontSize = 28.sp)
-                    Spacer(Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            "${user?.points ?: 0} pts",
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = Gold
-                        )
-                        Text("Collection points", style = MaterialTheme.typography.bodySmall, color = Muted)
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("✦", color = Gold, fontSize = 28.sp)
+                        Spacer(Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                "${user?.points ?: 0} pts",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = Gold
+                            )
+                            Text("Collection points", style = MaterialTheme.typography.bodySmall, color = Muted)
+                        }
+                    }
+
+                    val badge = user?.badge ?: "Explorer"
+                    if (badge.isNotEmpty()) {
+                        Spacer(Modifier.height(16.dp))
+                        HorizontalDivider(color = MuseumSurface, thickness = 0.5.dp)
+                        Spacer(Modifier.height(16.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val badgeEmoji = when (badge) {
+                                "Curator"   -> "🏛️"
+                                "Archivist" -> "📜"
+                                else        -> "🧭"
+                            }
+                            Text(badgeEmoji, style = MaterialTheme.typography.headlineMedium)
+                            Spacer(Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    "$badge Badge",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Gold
+                                )
+                                val badgeDesc = when (badge) {
+                                    "Curator"   -> "101–250 pts · Keep exploring!"
+                                    "Archivist" -> "251–500 pts · Master collector!"
+                                    else        -> "0–100 pts · Your journey begins"
+                                }
+                                Text(badgeDesc, style = MaterialTheme.typography.bodySmall, color = Muted)
+                            }
+                        }
                     }
                 }
             }

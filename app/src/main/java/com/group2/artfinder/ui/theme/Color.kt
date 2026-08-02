@@ -2,13 +2,24 @@ package com.group2.artfinder.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val MuseumBlack     = Color(0xFF0D0D14)
-val MuseumDark      = Color(0xFF1A1A2E)
-val MuseumSurface   = Color(0xFF22223A)
-val MuseumCard      = Color(0xFF2A2A45)
-val Gold            = Color(0xFFC9A84C)
-val GoldLight       = Color(0xFFE8C97A)
-val GoldDim         = Color(0xFF7A6030)
-val OffWhite        = Color(0xFFF5F0E8)
-val Muted           = Color(0xFF8A8AA8)
-val ErrorRed        = Color(0xFFCF6679)
+val ForestBlack     = Color(0xFF0A0F0A)
+val ForestDark      = Color(0xFF111A11)
+val ForestSurface   = Color(0xFF1A271A)
+val ForestCard      = Color(0xFF223322)
+val Sage            = Color(0xFF8FAF7A)
+val SageLight       = Color(0xFFB8D4A0)
+val SageDim         = Color(0xFF4A6640)
+val Ivory           = Color(0xFFF7F3E8)
+val Stone           = Color(0xFF8A9A82)
+val CrimsonRed      = Color(0xFFB85450)
+
+val MuseumBlack     = ForestBlack
+val MuseumDark      = ForestDark
+val MuseumSurface   = ForestSurface
+val MuseumCard      = ForestCard
+val Gold            = Sage
+val GoldLight       = SageLight
+val GoldDim         = SageDim
+val OffWhite        = Ivory
+val Muted           = Stone
+val ErrorRed        = CrimsonRed

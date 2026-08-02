@@ -32,6 +32,7 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import com.group2.artfinder.ui.screens.ArtMapScreen
 import com.group2.artfinder.ui.screens.VisitedArtworkScreen
 import com.group2.artfinder.viewmodel.VisitedArtworkViewModel
+import com.group2.artfinder.ui.screens.ArtworkPhotosScreen
 
 data class BottomNavItem(
     val label: String,
@@ -124,6 +125,19 @@ fun AppNavGraph() {
             composable("visited") {
                 VisitedArtworkScreen(navController, visitedViewModel)
             }
+
+            composable(
+                route     = "artworkPhotos/{artworkId}/{artworkTitle}",
+                arguments = listOf(
+                    navArgument("artworkId")    { type = NavType.IntType },
+                    navArgument("artworkTitle") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val artworkId    = backStackEntry.arguments?.getInt("artworkId") ?: 0
+                val artworkTitle = backStackEntry.arguments?.getString("artworkTitle") ?: ""
+                ArtworkPhotosScreen(navController, artworkId, artworkTitle, visitedViewModel)
+            }
+
             composable("artMap/{title}/{latitude}/{longitude}/{isVisited}") { backStackEntry ->
                 val title     = backStackEntry.arguments?.getString("title") ?: ""
                 val latitude  = backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull() ?: 0.0

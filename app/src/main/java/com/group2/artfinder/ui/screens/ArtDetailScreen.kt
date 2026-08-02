@@ -207,6 +207,20 @@ fun ArtDetailScreen(
                         Text("✦  View on Map", style = MaterialTheme.typography.titleMedium)
                     }
 
+                    if (isVisited) {
+                        Spacer(Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick  = {
+                                navController.navigate("artworkPhotos/${artwork.id}/${artwork.title}")
+                            },
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                            shape    = RoundedCornerShape(12.dp),
+                            border   = androidx.compose.foundation.BorderStroke(1.dp, Gold),
+                            colors   = ButtonDefaults.outlinedButtonColors(contentColor = Gold)
+                        ) {
+                            Text("✦  My Visit Photos", style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
 
                     Spacer(Modifier.height(32.dp))
                 }

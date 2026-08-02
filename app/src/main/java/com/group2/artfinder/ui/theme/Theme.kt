@@ -5,20 +5,20 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
 private val ArtFinderColorScheme = darkColorScheme(
-    primary              = Gold,
-    onPrimary            = MuseumBlack,
-    primaryContainer     = GoldDim,
-    onPrimaryContainer   = GoldLight,
-    secondary            = GoldLight,
-    onSecondary          = MuseumBlack,
-    background           = MuseumBlack,
-    onBackground         = OffWhite,
-    surface              = MuseumSurface,
-    onSurface            = OffWhite,
-    surfaceVariant       = MuseumCard,
-    onSurfaceVariant     = Muted,
-    error                = ErrorRed,
-    onError              = OffWhite,
+    primary              = Sage,
+    onPrimary            = ForestBlack,
+    primaryContainer     = SageDim,
+    onPrimaryContainer   = SageLight,
+    secondary            = SageLight,
+    onSecondary          = ForestBlack,
+    background           = ForestBlack,
+    onBackground         = Ivory,
+    surface              = ForestSurface,
+    onSurface            = Ivory,
+    surfaceVariant       = ForestCard,
+    onSurfaceVariant     = Stone,
+    error                = CrimsonRed,
+    onError              = Ivory,
 )
 
 @Composable

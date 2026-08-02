@@ -8,7 +8,8 @@ data class User(
     val username:   String  = "",
     val dob:        String  = "",
     val points:     Int     = 0,
-    val visitedCount: Int    = 0
+    val visitedCount: Int    = 0,
+    val badge: String = "Explorer"
 ) {
     val displayName: String
         get() = "$firstName $lastName".trim()
@@ -23,7 +24,8 @@ data class User(
         "username"  to username,
         "dob"       to dob,
         "points"    to points,
-        "visitedCount" to visitedCount
+        "visitedCount" to visitedCount,
+        "badge"        to badge
     )
 
     companion object {
@@ -35,7 +37,8 @@ data class User(
             username  = map["username"]  as? String ?: "",
             dob       = map["dob"]       as? String ?: "",
             points    = (map["points"]   as? Long)?.toInt() ?: 0,
-            visitedCount = (map["visitedCount"] as? Long)?.toInt() ?: 0
+            visitedCount = (map["visitedCount"] as? Long)?.toInt() ?: 0,
+            badge        = map["badge"]        as? String ?: "Explorer"
         )
     }
 }
