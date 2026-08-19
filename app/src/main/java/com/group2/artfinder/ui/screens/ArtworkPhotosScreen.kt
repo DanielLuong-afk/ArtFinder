@@ -169,7 +169,7 @@ fun ArtworkPhotosScreen(
                             if (bitmap != null) {
                                 Image(
                                     bitmap             = bitmap.asImageBitmap(),
-                                    contentDescription = "Visit photo",
+                                    contentDescription = "Photo of your visit to $artworkTitle",
                                     contentScale       = ContentScale.Crop,
                                     modifier           = Modifier
                                         .aspectRatio(1f)
@@ -180,7 +180,7 @@ fun ArtworkPhotosScreen(
                         } else {
                             AsyncImage(
                                 model              = photo,
-                                contentDescription = "Visit photo",
+                                contentDescription = "Photo of your visit to $artworkTitle",
                                 contentScale       = ContentScale.Crop,
                                 modifier           = Modifier
                                     .aspectRatio(1f)

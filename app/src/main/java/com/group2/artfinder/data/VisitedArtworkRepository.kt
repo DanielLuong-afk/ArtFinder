@@ -108,11 +108,7 @@ class VisitedArtworkRepository {
         currentPhotos.add(photoData)
         val newPhotoCount = currentPhotos.size
 
-        val newPoints = when {
-            newPhotoCount in 1..5  -> 10
-            newPhotoCount in 6..10 -> 20
-            else                   -> 20
-        }
+        val newPoints = PointsCalculator.pointsForPhotoCount(newPhotoCount)
 
         val pointsDiff = newPoints - previousPoints
 
@@ -138,12 +134,7 @@ class VisitedArtworkRepository {
     private suspend fun updateBadge() {
         val userDoc = db.collection("users").document(uid()).get().await()
         val points  = (userDoc.getLong("points") ?: 0).toInt()
-        val badge   = when {
-            points <= 100 -> "Explorer"
-            points <= 250 -> "Curator"
-            points <= 500 -> "Archivist"
-            else          -> "Archivist"
-        }
+        val badge   = PointsCalculator.badgeForPoints(points)
         db.collection("users").document(uid()).update("badge", badge).await()
     }
 }
